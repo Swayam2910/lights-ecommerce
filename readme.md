@@ -1,0 +1,1 @@
+This repo is for an ecommerce website for om lights. They sell lights and chandeliers. 
