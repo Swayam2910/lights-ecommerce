@@ -15,4 +15,5 @@ class Product(models.Model):
         max_length=100
     )
     added_at=models.DateTimeField(auto_now_add=True)
+    image=models.ImageField(upload_to='product_images/',null=True,blank=True)
 

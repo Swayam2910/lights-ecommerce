@@ -11,5 +11,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "price",
             "is_active",
             "category",
-            "is_priority"
+            "is_priority",
+            "image"
         ]
