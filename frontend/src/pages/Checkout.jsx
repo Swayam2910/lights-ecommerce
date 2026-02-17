@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Lock, MapPin, Phone, User, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from "../config";
 
 const Checkout = () => {
     const { cart, cartTotal, clearCart } = useCart();
@@ -40,7 +41,7 @@ const Checkout = () => {
 
     const handlePaymentSuccess = async (response, orderId) => {
         try {
-            const verifyResponse = await fetch('http://127.0.0.1:8000/api/orders/verify_payment/', {
+            const verifyResponse = await fetch(`${API_BASE_URL}orders/verify_payment/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const Checkout = () => {
 
     const handlePaymentFailure = async (response, razorpayOrderId) => {
         try {
-            await fetch('http://127.0.0.1:8000/api/orders/mark_payment_failed/', {
+            await fetch(`${API_BASE_URL}orders/mark_payment_failed/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,7 +107,7 @@ const Checkout = () => {
         };
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/orders/', {
+            const response = await fetch(`${API_BASE_URL}orders/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

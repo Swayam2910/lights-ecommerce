@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
+import { API_BASE_URL } from "../config";
 
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/',
+    baseURL: API_BASE_URL,
 });
 
 const Home = () => {
