@@ -32,16 +32,9 @@ function App() {
                 </p>
               </div>
 
-              {['Shop', 'Company', 'Support'].map((col) => (
-                <div key={col}>
-                  <h4 className="text-white font-medium mb-6">{col}</h4>
-                  <ul className="space-y-4 text-sm text-gray-500">
-                    <li><a href="#" className="hover:text-gold-500 transition-colors">Link One</a></li>
-                    <li><a href="#" className="hover:text-gold-500 transition-colors">Link Two</a></li>
-                    <li><a href="#" className="hover:text-gold-500 transition-colors">Link Three</a></li>
-                  </ul>
-                </div>
-              ))}
+              <div>
+                {/* Empty for now or specific links */}
+              </div>
             </div>
             <div className="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-white/5 flex justify-between text-xs text-gray-600 uppercase tracking-wider">
               <span>© 2026 Om Lights</span>

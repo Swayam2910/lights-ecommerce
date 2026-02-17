@@ -122,7 +122,7 @@ const Navbar = () => {
                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                             className="flex items-center justify-between w-full text-gray-300 hover:text-gold-400 py-2"
                         >
-                            <span>CATEGORIES</span>
+                            <span>Categories</span>
                             <ChevronDown size={16} className={`transition-transform duration-200 ${isCategoryOpen ? 'rotate-180' : ''}`} />
                         </button>
 
