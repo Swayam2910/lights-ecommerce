@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
     return (
@@ -33,12 +34,9 @@ const Hero = () => {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                        <button className="px-10 py-4 bg-gold-500 text-black font-semibold uppercase tracking-wider text-sm hover:bg-gold-400 transition-all transform hover:scale-105">
+                        <Link to="/shop" className="px-10 py-4 bg-gold-500 text-black font-semibold uppercase tracking-wider text-sm hover:bg-gold-400 transition-all transform hover:scale-105">
                             Shop Collections
-                        </button>
-                        <button className="px-10 py-4 border border-white/30 text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/10 transition-all">
-                            View Gallery
-                        </button>
+                        </Link>
                     </div>
                 </motion.div>
             </div>
