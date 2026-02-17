@@ -94,10 +94,16 @@ if os.environ.get('DATABASE_URL'):
         'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
     }
 else:
+    db_path = os.environ.get('SQLITE_DB_PATH')
+    if db_path:
+        db_name = Path(db_path)
+    else:
+        db_name = BASE_DIR / "db.sqlite3"
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": db_name,
         }
     }
 
