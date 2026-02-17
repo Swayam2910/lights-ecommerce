@@ -35,7 +35,7 @@ const ProductListingPage = () => {
                 if (priceRange.min) params.append('min_price', priceRange.min);
                 if (priceRange.max) params.append('max_price', priceRange.max);
 
-                const response = await fetch(`${API_BASE_URL}/products/?${params.toString()}`);
+                const response = await fetch(`${API_BASE_URL}products/?${params.toString()}`);
                 if (!response.ok) throw new Error('Failed to fetch products');
 
                 const data = await response.json();
