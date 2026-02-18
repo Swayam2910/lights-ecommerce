@@ -31,6 +31,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*", "lightsom.com", "www.lightsom.com", "62.72.57.167"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://lightsom.com",
+    "https://www.lightsom.com",
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
