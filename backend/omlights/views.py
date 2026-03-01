@@ -4,6 +4,14 @@ import django_filters
 from .models import Product, Order
 from .serializers import ProductSerializer, OrderSerializer
 
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+import razorpay
+from django.conf import settings
+
+from django.db import transaction
+
 class ProductFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name="price", lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name="price", lookup_expr='lte')
@@ -23,16 +31,9 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ['price', 'added_at', 'is_priority']
     ordering = ['-is_priority', '-added_at']
 
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
-import razorpay
-from django.conf import settings
-
-from django.db import transaction
-
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
+    authentication_classes = []
     serializer_class = OrderSerializer
 
     def create(self, request, *args, **kwargs):
