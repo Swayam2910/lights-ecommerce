@@ -1,13 +1,13 @@
 # Register your models here.
 from django.contrib import admin
-from .models import Product, Customer, Order, OrderItem
+from .models import Product, Customer, Order, OrderItem, PromoCode
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'in_stock', 'is_active', 'is_priority', 'added_at')
-    list_filter = ('category', 'in_stock', 'is_active', 'is_priority')
+    list_display = ('name', 'category', 'price', 'in_stock', 'is_priority', 'added_at')
+    list_filter = ('category', 'in_stock', 'is_priority')
     search_fields = ('name', 'category', 'description')
-    list_editable = ('in_stock', 'is_active', 'is_priority')
+    list_editable = ('in_stock', 'is_priority')
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -44,3 +44,10 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('customer__name', 'customer__email', 'id', 'customer__phone')
     inlines = [OrderItemInline]
     readonly_fields = ('created_at', 'updated_at', 'customer_info')
+
+@admin.register(PromoCode)
+class PromoCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'discount_percentage', 'valid_from', 'valid_to', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('code',)
+    filter_horizontal = ('applicable_products',)

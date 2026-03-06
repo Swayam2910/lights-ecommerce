@@ -21,7 +21,6 @@ class Product(models.Model):
         max_digits = 10,
         decimal_places=2
     )
-    is_active = models.BooleanField(default=True)
     is_priority = models.BooleanField(default=False)
     category=models.CharField(
         max_length=100,
@@ -91,3 +90,15 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in {self.order}"
+
+
+class PromoCode(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    applicable_products = models.ManyToManyField(Product, blank=True, related_name='promo_codes')
+    
+    def __str__(self):
+        return self.code

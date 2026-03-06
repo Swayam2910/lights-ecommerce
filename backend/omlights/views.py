@@ -1,16 +1,36 @@
 from rest_framework import viewsets, filters, serializers
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
-from .models import Product, Order
-from .serializers import ProductSerializer, OrderSerializer
+from django.utils import timezone
+from .models import Product, Order, PromoCode
+from .serializers import ProductSerializer, OrderSerializer, PromoCodeSerializer
 
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework import status
 import razorpay
 from django.conf import settings
 
 from django.db import transaction
+
+@api_view(['POST'])
+def validate_promocode(request):
+    code = request.data.get('code')
+    if not code:
+        return Response({'detail': 'Promo code is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        now = timezone.now()
+        promo = PromoCode.objects.get(
+            code__iexact=code, 
+            is_active=True,
+            valid_from__lte=now,
+            valid_to__gte=now
+        )
+        serializer = PromoCodeSerializer(promo)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except PromoCode.DoesNotExist:
+        return Response({'detail': 'Invalid or expired promo code'}, status=status.HTTP_404_NOT_FOUND)
 
 class ProductFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name="price", lookup_expr='gte')
@@ -23,7 +43,7 @@ class ProductFilter(django_filters.FilterSet):
 
 # Create your views here.
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.objects.filter(is_active=True).order_by('-is_priority', '-added_at')
+    queryset = Product.objects.filter(in_stock=True).order_by('-is_priority', '-added_at')
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ProductFilter

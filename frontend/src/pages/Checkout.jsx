@@ -19,6 +19,16 @@ const Checkout = () => {
 
     const [paymentMethod, setPaymentMethod] = useState('cod');
 
+    // Promo code state
+    const [promoCode, setPromoCode] = useState('');
+    const [appliedPromo, setAppliedPromo] = useState(null);
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const [promoLoading, setPromoLoading] = useState(false);
+    const [promoMessage, setPromoMessage] = useState({ type: '', text: '' });
+
+    const finalTotal = Math.max(0, cartTotal - discountAmount);
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -66,6 +76,58 @@ const Checkout = () => {
         }
     };
 
+    const handleApplyPromo = async () => {
+        if (!promoCode) {
+            setPromoMessage({ type: 'error', text: 'Please enter a promo code.' });
+            return;
+        }
+
+        setPromoLoading(true);
+        setPromoMessage({ type: '', text: '' });
+
+        try {
+            const response = await fetch(`${API_BASE_URL}promo-codes/validate/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: promoCode }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Calculate discount: basic implementation
+                let calculatedDiscount = 0;
+
+                // If it's a global discount (no specific products checked for simplicity)
+                // We just apply the percentage to cartTotal
+                const pct = parseFloat(data.discount_percentage);
+                calculatedDiscount = (cartTotal * pct) / 100;
+
+                setDiscountAmount(calculatedDiscount);
+                setAppliedPromo(data);
+                setPromoMessage({ type: 'success', text: `Promo code applied! You saved ₹${calculatedDiscount.toFixed(2)}` });
+            } else {
+                const errData = await response.json();
+                setPromoMessage({ type: 'error', text: errData.detail || 'Invalid promo code' });
+                setDiscountAmount(0);
+                setAppliedPromo(null);
+            }
+        } catch (error) {
+            setPromoMessage({ type: 'error', text: 'Error applying promo code.' });
+            setDiscountAmount(0);
+            setAppliedPromo(null);
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
+    const handleRemovePromo = () => {
+        setPromoCode('');
+        setAppliedPromo(null);
+        setDiscountAmount(0);
+        setPromoMessage({ type: '', text: '' });
+    };
+
     const handlePaymentFailure = async (response, razorpayOrderId) => {
         try {
             await fetch(`${API_BASE_URL}orders/mark_payment_failed/`, {
@@ -102,7 +164,7 @@ const Checkout = () => {
                 quantity: item.quantity,
                 price: item.price
             })),
-            total_price: cartTotal,
+            total_price: finalTotal,
             payment_method: paymentMethod
         };
 
@@ -345,14 +407,65 @@ const Checkout = () => {
                                     <span>Subtotal</span>
                                     <span>&#8377; {cartTotal.toFixed(2)}</span>
                                 </div>
+
+                                {appliedPromo && (
+                                    <div className="flex justify-between text-green-500">
+                                        <span>Discount ({appliedPromo.code})</span>
+                                        <span>-&#8377; {discountAmount.toFixed(2)}</span>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-between text-gray-400">
                                     <span>Shipping</span>
                                     <span>Free</span>
                                 </div>
                                 <div className="flex justify-between text-white font-serif text-xl border-t border-white/5 pt-4">
                                     <span>Total</span>
-                                    <span className="text-gold-500">&#8377; {cartTotal.toFixed(2)}</span>
+                                    <span className="text-gold-500">&#8377; {finalTotal.toFixed(2)}</span>
                                 </div>
+                            </div>
+
+                            {/* Promo Code Section */}
+                            <div className="mt-6 border-t border-white/5 pt-6">
+                                <label className="block text-sm text-gray-400 mb-2">Promo Code</label>
+                                {!appliedPromo ? (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={promoCode}
+                                            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                            placeholder="Enter Code"
+                                            className="flex-1 bg-white/5 border border-white/10 rounded py-2 px-4 text-white focus:border-gold-500 focus:outline-none uppercase"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleApplyPromo}
+                                            disabled={promoLoading || !promoCode}
+                                            className="bg-white/10 text-white px-4 py-2 rounded hover:bg-gold-500/20 hover:text-gold-500 transition-colors disabled:opacity-50"
+                                        >
+                                            {promoLoading ? 'Checking...' : 'Apply'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between bg-green-500/10 border border-green-500/20 rounded p-3">
+                                        <div className="flex items-center gap-2 text-green-500">
+                                            <CheckCircle size={16} />
+                                            <span className="font-medium text-sm">{appliedPromo.code} Applied</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleRemovePromo}
+                                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
+                                {promoMessage.text && (
+                                    <p className={`mt-2 text-xs ${promoMessage.type === 'error' ? 'text-red-500' : 'text-green-500'}`}>
+                                        {promoMessage.text}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-center gap-2 mt-4 text-gray-500 text-xs text-center">
